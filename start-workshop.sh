@@ -121,7 +121,7 @@ if [ "$BUILT" -eq 1 ]; then
 fi
 
 read -rp "Start image (compose up)? [y/N] " DO_START_IMAGE
-if [[ ! "$DO_START_IMAGE" =~ ^[Yy]$ ]]; then
+if [[ "$DO_START_IMAGE" =~ ^[Yy]$ ]]; then
     echo ""
     echo "Starting Jupyter Notebook server..."
     echo ""
