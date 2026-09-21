@@ -4,56 +4,55 @@
 set -e
 
 echo ""
-echo "🧩 Retrieval Playground - Docker Workshop Setup"
+echo "🧩 Retrieval Playground - Podman Workshop Setup"
 echo "================================================"
 echo ""
 
-# Prefer Docker Compose V2 plugin (`docker compose`); fall back to legacy `docker-compose`
-if docker compose version &>/dev/null; then
-    DOCKER_COMPOSE=(docker compose)
-elif command -v docker-compose &>/dev/null; then
-    DOCKER_COMPOSE=(docker-compose)
+# Prefer Podman Compose V2 plugin (`podman compose`); fall back to legacy `podman-compose`
+if podman compose version &>/dev/null; then
+    PODMAN_COMPOSE=(podman compose)
+elif command -v podman-compose &>/dev/null; then
+    PODMAN_COMPOSE=(podman-compose)
 else
-    echo "❌ Docker Compose is not installed!"
+    echo "❌ Podman Compose is not installed!"
     echo ""
-    echo "Linux:  sudo apt-get install docker-compose-plugin"
-    echo "Mac:    brew install docker-compose"
-    echo ""
-    exit 1
-fi
-
-# Check if Docker is installed
-if ! command -v docker &> /dev/null; then
-    echo "❌ Docker is not installed!"
-    echo ""
-    echo "Please install Docker Desktop from:"
-    echo "  Mac: https://docs.docker.com/desktop/install/mac-install/"
-    echo "  Linux: https://docs.docker.com/engine/install/"
+    echo "Linux:  sudo apt-get install podman-compose-plugin"
+    echo "Mac:    brew install podman-compose"
     echo ""
     exit 1
 fi
 
-# Check if Docker is running
-if ! docker info &> /dev/null; then
-    echo "❌ Docker is not running!"
+# Check if Podman is installed
+if ! command -v podman &> /dev/null; then
+    echo "❌ Podman is not installed!"
     echo ""
-    echo "Please start Docker Desktop and try again."
+    echo "Please install Podman Desktop from:"
+    echo "  https://docs.podman.com/desktop/install/mac-install/"
     echo ""
     exit 1
 fi
 
-echo "✅ Docker is installed and running"
+# Check if Podman is running
+if ! podman info &> /dev/null; then
+    echo "❌ Podman is not running!"
+    echo ""
+    echo "Please start Podman Desktop and try again."
+    echo ""
+    exit 1
+fi
+
+echo "✅ Podman is installed and running"
 echo ""
 
 # Free space from failed/interrupted builds (common cause of "No space left on device")
-if docker system df &>/dev/null; then
-    echo "Docker disk usage:"
-    docker system df
+if podman system df &>/dev/null; then
+    echo "Podman disk usage:"
+    podman system df
     echo ""
-    DANGLING=$(docker images -f "dangling=true" -q 2>/dev/null | wc -l | tr -d ' ')
+    DANGLING=$(podman images -f "dangling=true" -q 2>/dev/null | wc -l | tr -d ' ')
     if [ "$DANGLING" -gt 0 ]; then
         echo "Cleaning $DANGLING dangling image layer(s) from previous builds..."
-        docker image prune -f
+        podman image prune -f
         echo ""
     fi
 fi
@@ -86,26 +85,26 @@ fi
 
 BUILT=0
 IMAGE_NAME="retrieval-playground-retrieval-playground:latest"
-if docker image inspect "$IMAGE_NAME" &>/dev/null; then
+if podman image inspect "$IMAGE_NAME" &>/dev/null; then
     echo "Found existing workshop image ($IMAGE_NAME)."
     read -p "Rebuild image? [y/N] " REBUILD
     if [[ ! "$REBUILD" =~ ^[Yy]$ ]]; then
         echo "Skipping build, using existing image."
         echo ""
     else
-        echo "Building Docker image (this may take 5-10 minutes)..."
+        echo "Building Podman image (this may take 5-10 minutes)..."
         echo ""
-        "${DOCKER_COMPOSE[@]}" build
+        "${PODMAN_COMPOSE[@]}" build
         BUILT=1
     fi
 else
-    echo "Building Docker image (this may take 5-10 minutes on first run)..."
+    echo "Building Podman image (this may take 5-10 minutes on first run)..."
     echo "Tip: the image is ~11 GB (PyTorch, Docling, sentence-transformers)."
     echo "If the build fails with 'No space left on device', run:"
-    echo "  docker system prune -a"
-    echo "and ensure Docker has 20 GB+ free disk space."
+    echo "  podman system prune -a"
+    echo "and ensure Podman has 20 GB+ free disk space."
     echo ""
-    "${DOCKER_COMPOSE[@]}" build
+    "${PODMAN_COMPOSE[@]}" build
     BUILT=1
 fi
 
@@ -116,7 +115,7 @@ fi
 echo ""
 echo "Starting Jupyter Notebook server..."
 echo ""
-"${DOCKER_COMPOSE[@]}" up -d
+"${PODMAN_COMPOSE[@]}" up -d
 
 echo ""
 echo "✅ Jupyter Notebook is running!"
@@ -131,7 +130,7 @@ echo ""
 echo "📚 Navigate to: retrieval_playground/tutorial/"
 echo ""
 echo "💡 Useful commands:"
-echo "   Stop:     ${DOCKER_COMPOSE[*]} down"
-echo "   Restart:  ${DOCKER_COMPOSE[*]} restart"
-echo "   Logs:     ${DOCKER_COMPOSE[*]} logs -f"
+echo "   Stop:     ${PODMAN_COMPOSE[*]} down"
+echo "   Restart:  ${PODMAN_COMPOSE[*]} restart"
+echo "   Logs:     ${PODMAN_COMPOSE[*]} logs -f"
 echo ""
