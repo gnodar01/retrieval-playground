@@ -51,9 +51,16 @@ if podman system df &>/dev/null; then
     echo ""
     DANGLING=$(podman images -f "dangling=true" -q 2>/dev/null | wc -l | tr -d ' ')
     if [ "$DANGLING" -gt 0 ]; then
-        echo "Cleaning $DANGLING dangling image layer(s) from previous builds..."
-        podman image prune -f
-        echo ""
+      echo "Found $DANGLING dangling image layers from previous builds."
+      read -rp "Clean them up? [y/N] " DO_DANGLING
+        if [[ ! "$DO_DANGLING" =~ ^[Yy]$ ]]; then
+            echo "Skipping dangling cleanup."
+            echo ""
+        else
+            echo "Pruning dangling image layers..."
+            echo ""
+            podman image prune -f
+        fi
     fi
 fi
 
@@ -112,25 +119,29 @@ if [ "$BUILT" -eq 1 ]; then
     echo ""
     echo "✅ Build complete!"
 fi
-echo ""
-echo "Starting Jupyter Notebook server..."
-echo ""
-"${PODMAN_COMPOSE[@]}" up -d
 
-echo ""
-echo "✅ Jupyter Notebook is running!"
-echo ""
-echo "================================================"
-echo "📝 Access your notebooks at:"
-echo ""
-echo "   http://localhost:8888"
-echo ""
-echo "================================================"
-echo ""
-echo "📚 Navigate to: retrieval_playground/tutorial/"
-echo ""
-echo "💡 Useful commands:"
-echo "   Stop:     ${PODMAN_COMPOSE[*]} down"
-echo "   Restart:  ${PODMAN_COMPOSE[*]} restart"
-echo "   Logs:     ${PODMAN_COMPOSE[*]} logs -f"
-echo ""
+read -rp "Start image (compose up)? [y/N] " DO_START_IMAGE
+if [[ ! "$DO_START_IMAGE" =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "Starting Jupyter Notebook server..."
+    echo ""
+    "${PODMAN_COMPOSE[@]}" up -d
+
+    echo ""
+    echo "✅ Jupyter Notebook is running!"
+    echo ""
+    echo "================================================"
+    echo "📝 Access your notebooks at:"
+    echo ""
+    echo "   http://localhost:8888"
+    echo ""
+    echo "================================================"
+    echo ""
+    echo "📚 Navigate to: retrieval_playground/tutorial/"
+    echo ""
+    echo "💡 Useful commands:"
+    echo "   Stop:     ${PODMAN_COMPOSE[*]} down"
+    echo "   Restart:  ${PODMAN_COMPOSE[*]} restart"
+    echo "   Logs:     ${PODMAN_COMPOSE[*]} logs -f"
+    echo ""
+fi
