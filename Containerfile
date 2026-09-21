@@ -108,6 +108,22 @@ RUN echo "=== installed tool versions ===" \
          printf '%-12s ' "$t"; (command -v "$t" >/dev/null && "$t" --version 2>/dev/null | head -1) || echo "MISSING"; \
        done
 
+# --- personal environment: yadm dotfiles bring-up ----------------------------
+# Clone over HTTPS (no build-time SSH secret needed; the repo is public) and let
+# `--bootstrap` run .config/yadm/bootstrap, which: links the nvim##default alt,
+# runs `nvim --headless "+Lazy! sync" +qa` to install lazy.nvim's plugins, and
+# front-loads mason tools + treesitter parsers via provision.lua. See
+# gnodar01/dotfiles .config/yadm/bootstrap for the full sequence.
+ENV HOME=/root
+RUN yadm clone https://github.com/gnodar01/dotfiles.git --bootstrap
+
+# zsh plugins (fzf-tab, zsh-vi-mode, fast-syntax-highlighting) are cloned by
+# unplugged.zsh on the first interactive shell, not by the bootstrap (see the
+# comment at the top of .config/yadm/bootstrap). Force that first shell now so
+# the plugins are baked into the image instead of cloned (with a network
+# dependency) the first time someone opens a shell in the running container.
+RUN zsh -i -c 'exit'
+
 # Set working directory
 WORKDIR /workspace
 
