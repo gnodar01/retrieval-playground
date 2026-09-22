@@ -45,6 +45,10 @@ Each guide covers:
 4. **Create key in new project** or select existing project
 5. **Copy the API key** (starts with `AIza...`)
 
+NOTE: The API key used to start with `AIza...`, but that has [been changed](https://dev.to/rapls/i-created-a-gemini-api-key-and-got-aq-instead-of-aiza-3dp3) to `AQ.Ab...`,
+which is an Auth key, with the old standard keys being rejected as of Sept 2026.
+It is no longer OpenAI-compatible, but works the same natively (hitting `generativelanguage.googleapis.com` directly).
+
 > 💡 **Free tier:** Google Gemini offers free API access with generous limits for testing.
 
 ---
