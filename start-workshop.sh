@@ -92,7 +92,7 @@ fi
 
 BUILT=0
 IMAGE_NAME="retrieval-playground-retrieval-playground:latest"
-if podman image inspect "$IMAGE_NAME" &>/dev/null; then
+if (podman image inspect "$IMAGE_NAME" || podman image inspect "localhost/$IMAGE_NAME") &>/dev/null; then
     echo "Found existing workshop image ($IMAGE_NAME)."
     read -p "Rebuild image? [y/N] " REBUILD
     if [[ ! "$REBUILD" =~ ^[Yy]$ ]]; then
