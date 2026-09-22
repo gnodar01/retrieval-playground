@@ -133,7 +133,9 @@ COPY . .
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -e ".[notebook]" && \
-    pip install --no-cache-dir "langchain-community>=0.3,<0.4.2"
+    pip install --no-cache-dir "langchain-community>=0.3,<0.4.2" && \
+    pip install --no-cache-dir JLDracula
+
 
 # Pre-download Docling models from HuggingFace (avoids download during workshop)
 RUN python -c "\
