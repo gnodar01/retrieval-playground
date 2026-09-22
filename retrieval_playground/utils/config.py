@@ -149,9 +149,11 @@ _settings: Optional[AppSettings] = None
 def get_settings() -> AppSettings:
     global _settings
     if _settings is None:
+        from dotenv import load_dotenv
         try:
             repo_root = setup_repo_paths()
             env_file = repo_root / ".env"
+            load_dotenv(env_file)
             _settings = AppSettings(_env_file=str(env_file) if env_file.exists() else None)
         except Exception as e:
             error_msg = (
