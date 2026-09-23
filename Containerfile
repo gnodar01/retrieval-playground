@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     git \
     curl \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # generate the UTF-8 locale so zsh/nvim glyphs and completion behave
